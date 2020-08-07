@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="keycloak-external-database-provider" />
+        <module name="Keycloak-External-Database-Provider" />
       </profile>
     </annotationProcessing>
   </component>

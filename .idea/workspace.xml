@@ -68,6 +68,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="importingSettings">
       <MavenImportingSettings>
@@ -84,9 +87,10 @@
   <component name="PropertiesComponent">
     <property name="DatabaseDriversLRU" value="postgresql" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../BoCore/bo-core-be" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -189,10 +193,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596810225471">
+    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596814923822">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596810225471" />
+    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814923822" />
     <state x="765" y="236" key="#com.intellij.ide.util.MemberChooser" timestamp="1596806221825">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -205,22 +209,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="275" key="FileChooserDialogImpl/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596813546542" />
-    <state width="1877" height="689" key="GridCell.Tab.0.bottom" timestamp="1596814663292">
+    <state width="1877" height="438" key="GridCell.Tab.0.bottom" timestamp="1596814951244">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="689" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663292" />
-    <state width="1877" height="689" key="GridCell.Tab.0.center" timestamp="1596814663292">
+    <state width="1877" height="438" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
+    <state width="1877" height="438" key="GridCell.Tab.0.center" timestamp="1596814951244">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="689" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663292" />
-    <state width="1877" height="689" key="GridCell.Tab.0.left" timestamp="1596814663291">
+    <state width="1877" height="438" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
+    <state width="1877" height="438" key="GridCell.Tab.0.left" timestamp="1596814951244">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="689" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663291" />
-    <state width="1877" height="689" key="GridCell.Tab.0.right" timestamp="1596814663292">
+    <state width="1877" height="438" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
+    <state width="1877" height="438" key="GridCell.Tab.0.right" timestamp="1596814951244">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="689" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663292" />
+    <state width="1877" height="438" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
     <state width="1877" height="438" key="GridCell.Tab.1.bottom" timestamp="1596814663289">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
