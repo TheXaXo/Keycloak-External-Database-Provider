@@ -1,0 +1,14 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+target/
+.idea/
+keycloak-external-database-provider.iml
+logs/
+@logs.dir@
+
+/keycloak-external-database-provider.iml
+
+# eclipse / sts
+.classpath
+.project
+.settings/
+/keycloak-external-database-provider.iml

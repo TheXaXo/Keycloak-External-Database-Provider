@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7a49c7a9-022b-44e8-be8b-a6079eb6ce5d" name="Default Changelist" comment="" />
+    <list default="true" id="7a49c7a9-022b-44e8-be8b-a6079eb6ce5d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/c47c33df-57a1-41fc-8f3d-4cc687d8e4ef.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/c47c33df-57a1-41fc-8f3d-4cc687d8e4ef.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ExternalDatabaseStorageProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ExternalDatabaseStorageProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ExternalDatabaseStorageProvider$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ExternalDatabaseStorageProvider$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/ExternalDatabaseStorageProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/ExternalDatabaseStorageProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/keycloak-external-database-provider-1.0-SNAPSHOT-jar-with-dependencies.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/keycloak-external-database-provider-1.0-SNAPSHOT-jar-with-dependencies.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/keycloak-external-database-provider-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/keycloak-external-database-provider-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -90,20 +100,25 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/libs/com/atlassian/security/atlassian-security/3.2.14" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="project.structure.side.proportion" value="0.23333333" />
     <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\bashm\Desktop\Keycloak-External-Database-Provider\libs\com\atlassian\security\atlassian-password-encoder\3.2.14" />
+      <recent name="C:\Users\bashm\Desktop\Keycloak-External-Database-Provider\libs" />
+      <recent name="C:\Users\bashm\Desktop\Keycloak External Database Provider\src\main\resources\META-INF\services" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bashm\Desktop\Keycloak-External-Database-Provider\libs\com\atlassian\security\atlassian-security\3.2.14" />
+      <recent name="C:\Users\bashm\Desktop\Keycloak-External-Database-Provider\libs\com\atlassian\security\atlassian-password-encoder\3.2.14" />
+      <recent name="C:\Users\bashm\Desktop\Keycloak-External-Database-Provider\src\main\resources" />
       <recent name="C:\Users\bashm\Desktop\Keycloak External Database Provider\src\main\resources" />
       <recent name="C:\Users\bashm\Desktop\Keycloak External Database Provider\src\main\java" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\bashm\Desktop\Keycloak External Database Provider\src\main\resources\META-INF\services" />
     </key>
   </component>
   <component name="RunManager" selected="Maven.keycloak-external-database-provider [install...]">
@@ -157,17 +172,7 @@
       <list>
         <serviceView>
           <treeState>
-            <expand>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="root:bocore@localhost" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-              </path>
-              <path>
-                <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
-                <item name="root:bocore@localhost" type="7427dc5b:ServiceModel$ServiceGroupNode" />
-                <item name="com.intellij.database.console.session.MessageBusSession@5b104272" type="9fbbdea:ServiceModel$ServiceNode" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </treeState>
         </serviceView>
@@ -186,6 +191,8 @@
       <updated>1596789782695</updated>
       <workItem from="1596789785404" duration="3704000" />
       <workItem from="1596793602013" duration="11213000" />
+      <workItem from="1596814888076" duration="135000" />
+      <workItem from="1597055505704" duration="5227000" />
     </task>
     <servers />
   </component>
@@ -193,10 +200,10 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596814923822">
+    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1597057786991">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814923822" />
+    <state x="552" y="179" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597057786991" />
     <state x="765" y="236" key="#com.intellij.ide.util.MemberChooser" timestamp="1596806221825">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -205,60 +212,49 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="906" height="466" key="DebuggerActiveHint/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814532562" />
-    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1596813546542">
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1597057924959">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="275" key="FileChooserDialogImpl/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596813546542" />
-    <state width="1877" height="438" key="GridCell.Tab.0.bottom" timestamp="1596814951244">
+    <state x="740" y="275" key="FileChooserDialogImpl/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597057924959" />
+    <state width="1877" height="438" key="GridCell.Tab.0.bottom" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
-    <state width="1877" height="438" key="GridCell.Tab.0.center" timestamp="1596814951244">
+    <state width="1877" height="438" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.0.center" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
-    <state width="1877" height="438" key="GridCell.Tab.0.left" timestamp="1596814951244">
+    <state width="1877" height="438" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.0.left" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
-    <state width="1877" height="438" key="GridCell.Tab.0.right" timestamp="1596814951244">
+    <state width="1877" height="438" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.0.right" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814951244" />
-    <state width="1877" height="438" key="GridCell.Tab.1.bottom" timestamp="1596814663289">
+    <state width="1877" height="438" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.1.bottom" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.1.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663289" />
-    <state width="1877" height="438" key="GridCell.Tab.1.center" timestamp="1596814663288">
+    <state width="1877" height="438" key="GridCell.Tab.1.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.1.center" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.1.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663288" />
-    <state width="1877" height="438" key="GridCell.Tab.1.left" timestamp="1596814663288">
+    <state width="1877" height="438" key="GridCell.Tab.1.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.1.left" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.1.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663288" />
-    <state width="1877" height="438" key="GridCell.Tab.1.right" timestamp="1596814663289">
+    <state width="1877" height="438" key="GridCell.Tab.1.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state width="1877" height="438" key="GridCell.Tab.1.right" timestamp="1597061197466">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="438" key="GridCell.Tab.1.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596814663289" />
-    <state x="490" y="175" key="Maven.ArtifactSearchDialog" timestamp="1596813590607">
+    <state width="1877" height="438" key="GridCell.Tab.1.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597061197466" />
+    <state x="490" y="175" key="Maven.ArtifactSearchDialog" timestamp="1597056212982">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="490" y="175" key="Maven.ArtifactSearchDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596813590607" />
-    <state x="539" y="75" key="SettingsEditor" timestamp="1596808766177">
+    <state x="490" y="175" key="Maven.ArtifactSearchDialog/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597056212982" />
+    <state x="548" y="117" key="SettingsEditor" timestamp="1597060024802">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="539" y="75" key="SettingsEditor/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1596808766177" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/dao/UserDAO.java</url>
-          <line>30</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <state x="548" y="117" key="SettingsEditor/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1597060024802" />
   </component>
 </project>
