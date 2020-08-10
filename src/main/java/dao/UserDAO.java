@@ -18,7 +18,7 @@ public class UserDAO {
         return connection;
     }
 
-    public String getPassword(String username) {
+    public String getPasswordHashedByUsername(String username) {
         String sql = "select " + userTableConfig.getPasswordColumn() +
                 " from \"" + userTableConfig.getTableName() + "\"" +
                 " where " + userTableConfig.getUsernameColumn() + " = ?";
@@ -30,11 +30,10 @@ public class UserDAO {
                 if (resultSet.next()) {
                     return resultSet.getString(1);
                 }
+                return null;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 }

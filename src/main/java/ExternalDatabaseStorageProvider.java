@@ -7,6 +7,7 @@ import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.ReadOnlyException;
@@ -51,7 +52,7 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
         UserModel adapter = loadedUsers.get(username);
 
         if (adapter == null) {
-            String password = userDAO.getPassword(username);
+            String password = userDAO.getPasswordHashedByUsername(username);
 
             if (password != null) {
                 adapter = createAdapter(realm, username);
@@ -74,17 +75,16 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        String password = userDAO.getPassword(user.getUsername());
-        return supportsCredentialType(credentialType) && password != null;
+        return supportsCredentialType(credentialType);
     }
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-        if (!supportsCredentialType(input.getType())) {
+        if (!supportsCredentialType(input.getType()) || !(input instanceof UserCredentialModel)) {
             return false;
         }
 
-        String passwordHashed = userDAO.getPassword(user.getUsername());
+        String passwordHashed = userDAO.getPasswordHashedByUsername(user.getUsername());
 
         if (passwordHashed == null) {
             return false;
@@ -127,6 +127,7 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
             this.userDAO.getConnection().close();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
