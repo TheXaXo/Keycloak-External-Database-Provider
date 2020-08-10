@@ -50,7 +50,7 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
+            throw new RuntimeException(e);
         }
 
         return new ExternalDatabaseStorageProvider(session, model, userDAO);
