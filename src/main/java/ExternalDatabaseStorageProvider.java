@@ -1,5 +1,5 @@
 import com.atlassian.security.password.DefaultPasswordEncoder;
-import com.atlassian.security.password.PasswordEncoder;
+import config.PasswordHashingAlgorithm;
 import dao.UserDAO;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
@@ -25,15 +25,19 @@ import java.util.Set;
 public class ExternalDatabaseStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
 
     private final Map<String, UserModel> loadedUsers;
-    private final PasswordEncoder passwordEncoder;
 
+    private final PasswordHashingAlgorithm passwordHashingAlgorithm;
     private final KeycloakSession session;
     private final ComponentModel model;
     private final UserDAO userDAO;
 
-    public ExternalDatabaseStorageProvider(KeycloakSession session, ComponentModel model, UserDAO userDAO) {
+    public ExternalDatabaseStorageProvider(PasswordHashingAlgorithm passwordHashingAlgorithm,
+                                           KeycloakSession session,
+                                           ComponentModel model,
+                                           UserDAO userDAO) {
+
         this.loadedUsers = new HashMap<>();
-        this.passwordEncoder = DefaultPasswordEncoder.getDefaultInstance();
+        this.passwordHashingAlgorithm = passwordHashingAlgorithm;
         this.session = session;
         this.model = model;
         this.userDAO = userDAO;
@@ -90,7 +94,11 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
             return false;
         }
 
-        return passwordEncoder.isValidPassword(input.getChallengeResponse(), passwordHashed);
+        if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
+            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), passwordHashed);
+        }
+
+        return false;
     }
 
     @Override

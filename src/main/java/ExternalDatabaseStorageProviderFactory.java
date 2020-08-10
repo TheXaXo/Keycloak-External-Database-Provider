@@ -1,3 +1,5 @@
+import config.Database;
+import config.PasswordHashingAlgorithm;
 import config.UserTableConfig;
 import dao.UserDAO;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -14,32 +16,37 @@ import java.util.List;
 public class ExternalDatabaseStorageProviderFactory implements UserStorageProviderFactory<ExternalDatabaseStorageProvider> {
 
     public static final String PROVIDER_NAME = "external-database";
+    public static final String DB_DATABASE_KEY = "db:database";
     public static final String DB_HOST_KEY = "db:host";
     public static final String DB_PORT_KEY = "db:port";
-    public static final String DB_DATABASE_KEY = "db:database";
+    public static final String DB_DATABASE_NAME_KEY = "db:database-name";
     public static final String DB_USERNAME_KEY = "db:username";
     public static final String DB_PASSWORD_KEY = "db:password";
     public static final String DB_USER_TABLE_KEY = "db:user-table";
     public static final String DB_USER_TABLE_USERNAME_COLUMN_KEY = "db:user-table-username";
     public static final String DB_USER_TABLE_PASSWORD_COLUMN_KEY = "db:user-table-password";
+    public static final String DB_PASSWORD_HASHING_ALGORITHM_KEY = "db:password-hashing-algorithm";
 
     @Override
     public ExternalDatabaseStorageProvider create(KeycloakSession session, ComponentModel model) {
-        UserDAO userDAO = null;
+        UserDAO userDAO;
+        PasswordHashingAlgorithm passwordHashingAlgorithm;
 
         try {
             MultivaluedHashMap<String, String> config = model.getConfig();
 
+            Database database = Database.fromName(config.getFirst(DB_DATABASE_KEY));
             String host = config.getFirst(DB_HOST_KEY);
             String port = config.getFirst(DB_PORT_KEY);
-            String database = config.getFirst(DB_DATABASE_KEY);
+            String databaseName = config.getFirst(DB_DATABASE_NAME_KEY);
             String username = config.getFirst(DB_USERNAME_KEY);
             String password = config.getFirst(DB_PASSWORD_KEY);
+            passwordHashingAlgorithm = PasswordHashingAlgorithm.fromName(config.getFirst(DB_PASSWORD_HASHING_ALGORITHM_KEY));
 
-            Class.forName("org.postgresql.Driver");
+            Class.forName(database.getDriver());
 
             Connection connection = DriverManager.getConnection(
-                    "jdbc:postgresql://" + host + ":" + port + "/" + database, username, password);
+                    database.getProtocol() + "//" + host + ":" + port + "/" + databaseName, username, password);
 
             String userTable = config.getFirst(DB_USER_TABLE_KEY);
             String usernameColumn = config.getFirst(DB_USER_TABLE_USERNAME_COLUMN_KEY);
@@ -53,29 +60,35 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
             throw new RuntimeException(e);
         }
 
-        return new ExternalDatabaseStorageProvider(session, model, userDAO);
+        return new ExternalDatabaseStorageProvider(passwordHashingAlgorithm, session, model, userDAO);
     }
 
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         return ProviderConfigurationBuilder.create()
+                // Database
+                .property().name(DB_DATABASE_KEY)
+                .type(ProviderConfigProperty.LIST_TYPE)
+                .label("Database")
+                .options(Database.POSTGRESQL.getName())
+                .add()
+
                 // Connection Host
                 .property().name(DB_HOST_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Host")
                 .defaultValue("localhost")
-                .helpText("Host of the connection")
                 .add()
 
                 // DB Port
                 .property().name(DB_PORT_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Port")
-                .defaultValue("3306")
+                .defaultValue("5432")
                 .add()
 
-                // Connection Database
-                .property().name(DB_DATABASE_KEY)
+                // Database Name
+                .property().name(DB_DATABASE_NAME_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Name")
                 .add()
@@ -113,6 +126,13 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Password Column Name")
                 .defaultValue("password")
+                .add()
+
+                // Password Hashing Algorithm
+                .property().name(DB_PASSWORD_HASHING_ALGORITHM_KEY)
+                .type(ProviderConfigProperty.LIST_TYPE)
+                .label("Password Hashing Algorithm")
+                .options(PasswordHashingAlgorithm.PKCS5S2.getName())
                 .add()
                 .build();
     }
