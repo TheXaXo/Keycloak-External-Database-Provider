@@ -7,10 +7,7 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.ReadOnlyException;
 import org.keycloak.storage.StorageId;
@@ -27,8 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExternalDatabaseStorageProvider implements
         UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
 
-    private final Map<String, UserModel> loadedUsers;
+    private static final String CREDENTIAL_ATTRIBUTE = "credential";
 
+    private final Map<String, UserModel> loadedUsers;
     private final PasswordHashingAlgorithm passwordHashingAlgorithm;
     private final KeycloakSession session;
     private final ComponentModel model;
@@ -59,21 +57,25 @@ public class ExternalDatabaseStorageProvider implements
         UserModel adapter = loadedUsers.get(username);
 
         if (adapter == null) {
-
-            SimpleUserModel user = userDAO.getUserByUsername(username);
+            SimpleUserModel user = userDAO.getUserByColumn(realm, Column.USERNAME, username);
 
             if (user != null) {
                 adapter = createAdapter(realm, user);
                 loadedUsers.put(username, adapter);
             }
         }
+
         return adapter;
     }
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        SimpleUserModel user = userDAO.getUserByEmail(email);
-        return createAdapter(realm, user);
+        SimpleUserModel user = userDAO.getUserByColumn(realm, Column.EMAIL, email);
+
+        UserModel adapter = createAdapter(realm, user);
+        loadedUsers.put(user.getUsername(), adapter);
+
+        return adapter;
     }
 
     @Override
@@ -92,13 +94,13 @@ public class ExternalDatabaseStorageProvider implements
             return false;
         }
 
-        SimpleUserModel user = userDAO.getUserByUsername(userModel.getUsername());
-        if (user == null) {
-            return false;
-        }
+        UserModel adapter = this.getUserByUsername(userModel.getUsername(), realm);
+        String credential = adapter.getFirstAttribute(CREDENTIAL_ATTRIBUTE);
+
         if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
-            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), user.getCredential());
+            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), credential);
         }
+
         return false;
     }
 
@@ -107,6 +109,7 @@ public class ExternalDatabaseStorageProvider implements
         if (supportsCredentialType(input.getType())) {
             throw new ReadOnlyException("Users are read-only.");
         }
+
         return false;
     }
 
@@ -130,6 +133,20 @@ public class ExternalDatabaseStorageProvider implements
             @Override
             public String getEmail() {
                 return user.getEmail();
+            }
+
+            @Override
+            public String getFirstAttribute(String name) {
+                if (name.equals(CREDENTIAL_ATTRIBUTE)) {
+                    return user.getCredential();
+                }
+
+                return null;
+            }
+
+            @Override
+            public Set<RoleModel> getRoleMappings() {
+                return user.getRoleMappings();
             }
         };
     }
