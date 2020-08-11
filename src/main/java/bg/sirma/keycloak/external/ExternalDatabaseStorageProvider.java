@@ -1,6 +1,8 @@
+package bg.sirma.keycloak.external;
+
 import com.atlassian.security.password.DefaultPasswordEncoder;
-import config.PasswordHashingAlgorithm;
-import dao.UserDAO;
+import bg.sirma.keycloak.external.config.PasswordHashingAlgorithm;
+import bg.sirma.keycloak.external.dao.UserDAO;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
@@ -17,12 +19,13 @@ import org.keycloak.storage.adapter.AbstractUserAdapter;
 import org.keycloak.storage.user.UserLookupProvider;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class ExternalDatabaseStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
+public class ExternalDatabaseStorageProvider implements
+        UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
 
     private final Map<String, UserModel> loadedUsers;
 
@@ -36,7 +39,7 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
                                            ComponentModel model,
                                            UserDAO userDAO) {
 
-        this.loadedUsers = new HashMap<>();
+        this.loadedUsers = new ConcurrentHashMap<>();
         this.passwordHashingAlgorithm = passwordHashingAlgorithm;
         this.session = session;
         this.model = model;
@@ -56,20 +59,21 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
         UserModel adapter = loadedUsers.get(username);
 
         if (adapter == null) {
-            String password = userDAO.getPasswordHashedByUsername(username);
 
-            if (password != null) {
-                adapter = createAdapter(realm, username);
+            SimpleUserModel user = userDAO.getUserByUsername(username);
+
+            if (user != null) {
+                adapter = createAdapter(realm, user);
                 loadedUsers.put(username, adapter);
             }
         }
-
         return adapter;
     }
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        return null;
+        SimpleUserModel user = userDAO.getUserByEmail(email);
+        return createAdapter(realm, user);
     }
 
     @Override
@@ -83,21 +87,18 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
     }
 
     @Override
-    public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
+    public boolean isValid(RealmModel realm, UserModel userModel, CredentialInput input) {
         if (!supportsCredentialType(input.getType()) || !(input instanceof UserCredentialModel)) {
             return false;
         }
 
-        String passwordHashed = userDAO.getPasswordHashedByUsername(user.getUsername());
-
-        if (passwordHashed == null) {
+        SimpleUserModel user = userDAO.getUserByUsername(userModel.getUsername());
+        if (user == null) {
             return false;
         }
-
         if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
-            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), passwordHashed);
+            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), user.getCredential());
         }
-
         return false;
     }
 
@@ -106,7 +107,6 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
         if (supportsCredentialType(input.getType())) {
             throw new ReadOnlyException("Users are read-only.");
         }
-
         return false;
     }
 
@@ -120,11 +120,16 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
         return new HashSet<>();
     }
 
-    private UserModel createAdapter(RealmModel realm, String username) {
+    private UserModel createAdapter(RealmModel realm, SimpleUserModel user) {
         return new AbstractUserAdapter(session, realm, model) {
             @Override
             public String getUsername() {
-                return username;
+                return user.getUsername();
+            }
+
+            @Override
+            public String getEmail() {
+                return user.getEmail();
             }
         };
     }
