@@ -25,8 +25,8 @@ public class ExternalDatabaseStorageProvider implements
         UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
 
     private static final String CREDENTIAL_ATTRIBUTE = "credential";
-    private final Map<String, UserModel> loadedUsers;
 
+    private final Map<String, UserModel> loadedUsers;
     private final PasswordHashingAlgorithm passwordHashingAlgorithm;
     private final KeycloakSession session;
     private final ComponentModel model;
@@ -94,7 +94,8 @@ public class ExternalDatabaseStorageProvider implements
             return false;
         }
 
-        String credential = userModel.getFirstAttribute(CREDENTIAL_ATTRIBUTE);
+        UserModel adapter = this.getUserByUsername(userModel.getUsername(), realm);
+        String credential = adapter.getFirstAttribute(CREDENTIAL_ATTRIBUTE);
 
         if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
             return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), credential);
@@ -123,7 +124,7 @@ public class ExternalDatabaseStorageProvider implements
     }
 
     private UserModel createAdapter(RealmModel realm, SimpleUserModel user) {
-        UserModel adapter = new AbstractUserAdapter(session, realm, model) {
+        return new AbstractUserAdapter(session, realm, model) {
             @Override
             public String getUsername() {
                 return user.getUsername();
@@ -135,13 +136,19 @@ public class ExternalDatabaseStorageProvider implements
             }
 
             @Override
+            public String getFirstAttribute(String name) {
+                if (name.equals(CREDENTIAL_ATTRIBUTE)) {
+                    return user.getCredential();
+                }
+
+                return null;
+            }
+
+            @Override
             public Set<RoleModel> getRoleMappings() {
                 return user.getRoleMappings();
             }
         };
-
-        adapter.setSingleAttribute(CREDENTIAL_ATTRIBUTE, user.getCredential());
-        return adapter;
     }
 
     @Override
