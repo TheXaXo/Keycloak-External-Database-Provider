@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExternalDatabaseStorageProvider implements
         UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
 
+    private static final String CREDENTIAL_ATTRIBUTE = "credential";
     private final Map<String, UserModel> loadedUsers;
 
     private final PasswordHashingAlgorithm passwordHashingAlgorithm;
@@ -70,7 +71,11 @@ public class ExternalDatabaseStorageProvider implements
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
         SimpleUserModel user = userDAO.getUserByColumn(realm, Column.EMAIL, email);
-        return createAdapter(realm, user);
+
+        UserModel adapter = createAdapter(realm, user);
+        loadedUsers.put(user.getUsername(), adapter);
+
+        return adapter;
     }
 
     @Override
@@ -89,14 +94,10 @@ public class ExternalDatabaseStorageProvider implements
             return false;
         }
 
-        SimpleUserModel user = userDAO.getUserByColumn(realm, Column.USERNAME, userModel.getUsername());
-
-        if (user == null) {
-            return false;
-        }
+        String credential = userModel.getFirstAttribute(CREDENTIAL_ATTRIBUTE);
 
         if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
-            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), user.getCredential());
+            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), credential);
         }
 
         return false;
@@ -122,7 +123,7 @@ public class ExternalDatabaseStorageProvider implements
     }
 
     private UserModel createAdapter(RealmModel realm, SimpleUserModel user) {
-        return new AbstractUserAdapter(session, realm, model) {
+        UserModel adapter = new AbstractUserAdapter(session, realm, model) {
             @Override
             public String getUsername() {
                 return user.getUsername();
@@ -138,6 +139,9 @@ public class ExternalDatabaseStorageProvider implements
                 return user.getRoleMappings();
             }
         };
+
+        adapter.setSingleAttribute(CREDENTIAL_ATTRIBUTE, user.getCredential());
+        return adapter;
     }
 
     @Override
