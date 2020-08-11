@@ -1,4 +1,4 @@
-package config;
+package bg.sirma.keycloak.external.config;
 
 public enum PasswordHashingAlgorithm {
     PKCS5S2("Atlassian PKCS5S2");

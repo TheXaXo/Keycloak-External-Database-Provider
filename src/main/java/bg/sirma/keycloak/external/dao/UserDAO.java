@@ -1,13 +1,20 @@
-package dao;
+package bg.sirma.keycloak.external.dao;
 
-import config.DatabaseConfig;
+import bg.sirma.keycloak.external.Column;
+import bg.sirma.keycloak.external.SimpleUserModel;
+import bg.sirma.keycloak.external.config.DatabaseConfig;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 
-import java.sql.*;
-import java.util.Arrays;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserDAO {
 
@@ -23,18 +30,31 @@ public class UserDAO {
         return connection;
     }
 
-    public String getPasswordHashedByUsername(String username) {
-        String sql = "select " + databaseConfig.getPasswordColumn() +
-                " from \"" + databaseConfig.getUserTable() + "\"" +
-                " where " + databaseConfig.getUsernameColumn() + " = ?";
+    public SimpleUserModel getUserByColumn(RealmModel realm, Column column, String value) {
+        List<String> columns = Stream.of(databaseConfig.getUsernameColumn(), databaseConfig.getEmailColumn(), databaseConfig.getPasswordColumn())
+                .map(col -> "\"" + col.trim() + "\"")
+                .collect(Collectors.toList());
+
+        String columnToSearch = column.equals(Column.USERNAME) ?
+                databaseConfig.getUsernameColumn().trim() : databaseConfig.getEmailColumn().trim();
+
+        String sql = "select " + String.join(", ", columns) +
+                " from \"" + databaseConfig.getUserTable().trim() + "\"" +
+                " where \"" + columnToSearch + "\" = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
+            statement.setString(1, value);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getString(1);
+                    String username = resultSet.getString(1);
+                    String email = resultSet.getString(2);
+                    String credential = resultSet.getString(3);
+                    Set<RoleModel> roleMappings = this.getRoleMappings(realm, username);
+
+                    return new SimpleUserModel(username, email, credential, roleMappings);
                 }
+
                 return null;
             }
         } catch (SQLException e) {

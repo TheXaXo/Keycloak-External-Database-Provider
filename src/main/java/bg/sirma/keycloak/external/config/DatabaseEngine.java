@@ -1,4 +1,4 @@
-package config;
+package bg.sirma.keycloak.external.config;
 
 public enum DatabaseEngine {
     POSTGRESQL("PostgreSQL", "jdbc:postgresql:", "org.postgresql.Driver");

@@ -1,7 +1,9 @@
-import config.DatabaseEngine;
-import config.PasswordHashingAlgorithm;
-import config.DatabaseConfig;
-import dao.UserDAO;
+package bg.sirma.keycloak.external;
+
+import bg.sirma.keycloak.external.config.DatabaseConfig;
+import bg.sirma.keycloak.external.config.DatabaseEngine;
+import bg.sirma.keycloak.external.config.PasswordHashingAlgorithm;
+import bg.sirma.keycloak.external.dao.UserDAO;
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
@@ -24,6 +26,7 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
     public static final String DB_PASSWORD_KEY = "db:password";
     public static final String DB_USER_TABLE_KEY = "db:user-table";
     public static final String DB_USER_TABLE_USERNAME_COLUMN_KEY = "db:user-table-username";
+    public static final String DB_USER_TABLE_EMAIL_COLUMN_KEY = "db:user-table-email";
     public static final String DB_USER_TABLE_PASSWORD_COLUMN_KEY = "db:user-table-password";
     public static final String DB_PASSWORD_HASHING_ALGORITHM_KEY = "db:password-hashing-algorithm";
     public static final String DB_ROLES_SQL_KEY = "db:roles-sql";
@@ -51,10 +54,11 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
 
             String userTable = config.getFirst(DB_USER_TABLE_KEY);
             String usernameColumn = config.getFirst(DB_USER_TABLE_USERNAME_COLUMN_KEY);
+            String emailColumn = config.getFirst(DB_USER_TABLE_EMAIL_COLUMN_KEY);
             String passwordColumn = config.getFirst(DB_USER_TABLE_PASSWORD_COLUMN_KEY);
             String rolesSql = config.getFirst(DB_ROLES_SQL_KEY);
 
-            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, passwordColumn, rolesSql);
+            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, passwordColumn, rolesSql);
             userDAO = new UserDAO(connection, databaseConfig);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +84,7 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .property().name(DB_HOST_KEY)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Database Host")
-                .defaultValue("localhost")
+                .defaultValue("127.0.0.1")
                 .add()
 
                 // DB Port
@@ -107,7 +111,7 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .property().name(DB_PASSWORD_KEY)
                 .type(ProviderConfigProperty.PASSWORD)
                 .label("Database Password")
-                .defaultValue("PASSWORD")
+                .secret(true)
                 .add()
 
                 // User Table
@@ -122,6 +126,13 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Username Column Name")
                 .defaultValue("username")
+                .add()
+
+                // Email Column
+                .property().name(DB_USER_TABLE_EMAIL_COLUMN_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Email Column Name")
+                .defaultValue("email")
                 .add()
 
                 // Password Column
