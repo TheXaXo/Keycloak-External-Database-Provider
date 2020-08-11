@@ -27,8 +27,9 @@ import java.util.stream.Collectors;
 public class ExternalDatabaseStorageProvider implements
         UserStorageProvider, UserLookupProvider, UserQueryProvider, CredentialInputValidator, CredentialInputUpdater {
 
-    private final Map<String, UserModel> loadedUsers;
+    private static final String CREDENTIAL_ATTRIBUTE = "credential";
 
+    private final Map<String, UserModel> loadedUsers;
     private final PasswordHashingAlgorithm passwordHashingAlgorithm;
     private final KeycloakSession session;
     private final ComponentModel model;
@@ -59,21 +60,25 @@ public class ExternalDatabaseStorageProvider implements
         UserModel adapter = loadedUsers.get(username);
 
         if (adapter == null) {
-
-            SimpleUserModel user = userDAO.getUserByUsername(username);
+            SimpleUserModel user = userDAO.getUserByColumn(realm, Column.USERNAME, username);
 
             if (user != null) {
                 adapter = createAdapter(realm, user);
                 loadedUsers.put(username, adapter);
             }
         }
+
         return adapter;
     }
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        SimpleUserModel user = userDAO.getUserByEmail(email);
-        return createAdapter(realm, user);
+        SimpleUserModel user = userDAO.getUserByColumn(realm, Column.EMAIL, email);
+
+        UserModel adapter = createAdapter(realm, user);
+        loadedUsers.put(user.getUsername(), adapter);
+
+        return adapter;
     }
 
     @Override
@@ -92,13 +97,13 @@ public class ExternalDatabaseStorageProvider implements
             return false;
         }
 
-        SimpleUserModel user = userDAO.getUserByUsername(userModel.getUsername());
-        if (user == null) {
-            return false;
-        }
+        UserModel adapter = this.getUserByUsername(userModel.getUsername(), realm);
+        String credential = adapter.getFirstAttribute(CREDENTIAL_ATTRIBUTE);
+
         if (passwordHashingAlgorithm.name().equals(PasswordHashingAlgorithm.PKCS5S2.name())) {
-            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), user.getCredential());
+            return DefaultPasswordEncoder.getDefaultInstance().isValidPassword(input.getChallengeResponse(), credential);
         }
+
         return false;
     }
 
@@ -107,6 +112,7 @@ public class ExternalDatabaseStorageProvider implements
         if (supportsCredentialType(input.getType())) {
             throw new ReadOnlyException("Users are read-only.");
         }
+
         return false;
     }
 
@@ -131,6 +137,20 @@ public class ExternalDatabaseStorageProvider implements
             public String getEmail() {
                 return user.getEmail();
             }
+
+            @Override
+            public String getFirstAttribute(String name) {
+                if (name.equals(CREDENTIAL_ATTRIBUTE)) {
+                    return user.getCredential();
+                }
+
+                return null;
+            }
+
+            @Override
+            public Set<RoleModel> getRoleMappings() {
+                return user.getRoleMappings();
+            }
         };
     }
 
@@ -151,32 +171,32 @@ public class ExternalDatabaseStorageProvider implements
 
     @Override
     public List<UserModel> getUsers(RealmModel realm) {
-        return convertUserModel(realm, userDAO.getUsers());
+        return convertUserModel(realm, userDAO.getUsers(realm));
     }
 
     @Override
     public List<UserModel> getUsers(RealmModel realm, int firstResult, int maxResults) {
-        return convertUserModel(realm, userDAO.getUsers(firstResult, maxResults));
+        return convertUserModel(realm, userDAO.getUsers( realm, firstResult, maxResults));
     }
 
     @Override
     public List<UserModel> searchForUser(String search, RealmModel realm) {
-        return convertUserModel(realm, userDAO.searchForUser(search, null, null));
+        return convertUserModel(realm, userDAO.searchForUser(realm, search, null, null));
     }
 
     @Override
     public List<UserModel> searchForUser(String search, RealmModel realm, int firstResult, int maxResults) {
-        return convertUserModel(realm, userDAO.searchForUser(search, firstResult, maxResults));
+        return convertUserModel(realm, userDAO.searchForUser(realm, search, firstResult, maxResults));
     }
 
     @Override
     public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm) {
-        return convertUserModel(realm, userDAO.searchForUser(params, null, null));
+        return convertUserModel(realm, userDAO.searchForUser(realm, params, null, null));
     }
 
     @Override
     public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm, int firstResult, int maxResults) {
-        return convertUserModel(realm, userDAO.searchForUser(params, firstResult, maxResults));
+        return convertUserModel(realm, userDAO.searchForUser(realm, params, firstResult, maxResults));
     }
 
     @Override
@@ -198,3 +218,4 @@ public class ExternalDatabaseStorageProvider implements
         return users.stream().map(u -> createAdapter(realm, u)).collect(Collectors.toList());
     }
 }
+

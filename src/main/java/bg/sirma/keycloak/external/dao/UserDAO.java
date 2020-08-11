@@ -1,7 +1,10 @@
 package bg.sirma.keycloak.external.dao;
 
+import bg.sirma.keycloak.external.Column;
 import bg.sirma.keycloak.external.SimpleUserModel;
-import bg.sirma.keycloak.external.config.UserTableConfig;
+import bg.sirma.keycloak.external.config.DatabaseConfig;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,35 +17,42 @@ import java.util.stream.Stream;
 public class UserDAO {
 
     private final Connection connection;
-    private final UserTableConfig userTableConfig;
+    private final DatabaseConfig databaseConfig;
 
-    public UserDAO(Connection connection, UserTableConfig userTableConfig) {
+    public UserDAO(Connection connection, DatabaseConfig databaseConfig) {
         this.connection = connection;
-        this.userTableConfig = userTableConfig;
+        this.databaseConfig = databaseConfig;
     }
 
     public Connection getConnection() {
         return connection;
     }
 
-    public SimpleUserModel getUserByUsername(String usernameToSearch) {
-        List<String> columns = Stream.of(userTableConfig.getUsernameColumn(), userTableConfig.getEmailColumn(), userTableConfig.getPasswordColumn())
+    public SimpleUserModel getUserByColumn(RealmModel realm, Column column, String value) {
+        List<String> columns = Stream.of(databaseConfig.getUsernameColumn(), databaseConfig.getEmailColumn(), databaseConfig.getPasswordColumn())
                 .map(col -> "\"" + col.trim() + "\"")
                 .collect(Collectors.toList());
+
+        String columnToSearch = column.equals(Column.USERNAME) ?
+                databaseConfig.getUsernameColumn().trim() : databaseConfig.getEmailColumn().trim();
+
         String sql = "select " + String.join(", ", columns) +
-                " from \"" + userTableConfig.getTableName().trim() + "\"" +
-                " where \"" + userTableConfig.getUsernameColumn().trim() + "\" = ?";
+                " from \"" + databaseConfig.getUserTable().trim() + "\"" +
+                " where \"" + columnToSearch + "\" = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, usernameToSearch);
+            statement.setString(1, value);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String username = resultSet.getString(1);
                     String email = resultSet.getString(2);
                     String credential = resultSet.getString(3);
-                    return new SimpleUserModel(username, email, credential);
+                    Set<RoleModel> roleMappings = this.getRoleMappings(realm, username);
+
+                    return new SimpleUserModel(username, email, credential, roleMappings);
                 }
+
                 return null;
             }
         } catch (SQLException e) {
@@ -50,25 +60,25 @@ public class UserDAO {
         }
     }
 
-    public SimpleUserModel getUserByEmail(String emailToSearch) {
-        List<String> columns = Stream.of(userTableConfig.getUsernameColumn(), userTableConfig.getEmailColumn(), userTableConfig.getPasswordColumn())
-                .map(col -> "\"" + col.trim() + "\"")
-                .collect(Collectors.toList());
-        String sql = "select " + String.join(", ", columns) +
-                " from \"" + userTableConfig.getTableName().trim() + "\"" +
-                " where \"" + userTableConfig.getEmailColumn().trim() + "\" = ?";
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, emailToSearch);
+    public Set<RoleModel> getRoleMappings(RealmModel realm, String username) {
+        try (PreparedStatement statement = connection.prepareStatement(this.databaseConfig.getRolesSql())) {
+            statement.setString(1, username);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    String username = resultSet.getString(1);
-                    String email = resultSet.getString(2);
-                    String credential = resultSet.getString(3);
-                    return new SimpleUserModel(username, email, credential);
+                Set<RoleModel> roleMappings = new HashSet<>();
+
+                while (resultSet.next()) {
+                    String role = resultSet.getString(1);
+                    RoleModel roleMapping = realm.getRole(role);
+
+                    if (roleMapping == null) {
+                        roleMapping = realm.addRole(role);
+                    }
+
+                    roleMappings.add(roleMapping);
                 }
-                return null;
+
+                return roleMappings;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -77,7 +87,7 @@ public class UserDAO {
 
     public int getUsersCount() {
         String sql = "select count(*)" +
-                " from \"" + userTableConfig.getTableName().trim() + "\"";
+                " from \"" + databaseConfig.getUserTable().trim() + "\"";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -92,16 +102,16 @@ public class UserDAO {
         }
     }
 
-    public List<SimpleUserModel> getUsers() {
-        return getUsers(null, null);
+    public List<SimpleUserModel> getUsers(RealmModel realm) {
+        return getUsers(realm, null, null);
     }
 
-    public List<SimpleUserModel> getUsers(Integer firstResult, Integer maxResults) {
-        List<String> columns = Stream.of(userTableConfig.getUsernameColumn(), userTableConfig.getEmailColumn(), userTableConfig.getPasswordColumn())
+    public List<SimpleUserModel> getUsers(RealmModel realm, Integer firstResult, Integer maxResults) {
+        List<String> columns = Stream.of(databaseConfig.getUsernameColumn(), databaseConfig.getEmailColumn(), databaseConfig.getPasswordColumn())
                 .map(col -> "\"" + col.trim() + "\"")
                 .collect(Collectors.toList());
         String sql = "select " + String.join(", ", columns) +
-                " from \"" + userTableConfig.getTableName().trim() + "\"";
+                " from \"" + databaseConfig.getUserTable().trim() + "\"";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             if (maxResults != null) {
@@ -120,7 +130,9 @@ public class UserDAO {
                     String username = resultSet.getString(1);
                     String email = resultSet.getString(2);
                     String credential = resultSet.getString(3);
-                    users.add(new SimpleUserModel(username, email, credential));
+
+                    Set<RoleModel> roleMappings = getRoleMappings(realm, username);
+                    users.add(new SimpleUserModel(username, email, credential, roleMappings));
                 }
                 return users;
             }
@@ -129,8 +141,8 @@ public class UserDAO {
         }
     }
 
-    public List<SimpleUserModel> searchForUser(String search, Integer firstResult, Integer maxResults) {
-        List<String> columns = Stream.of(userTableConfig.getUsernameColumn(), userTableConfig.getEmailColumn(), userTableConfig.getPasswordColumn())
+    public List<SimpleUserModel> searchForUser(RealmModel realm, String search, Integer firstResult, Integer maxResults) {
+        List<String> columns = Stream.of(databaseConfig.getUsernameColumn(), databaseConfig.getEmailColumn(), databaseConfig.getPasswordColumn())
                 .map(col -> "\"" + col.trim() + "\"")
                 .collect(Collectors.toList());
         search = search.trim();
@@ -141,8 +153,8 @@ public class UserDAO {
             search += "%";
         }
         String sql = "select " + String.join(", ", columns) +
-                " from \"" + userTableConfig.getTableName().trim() + "\"" +
-                " where \"" + userTableConfig.getUsernameColumn() + "\" ilike ? or \"" + userTableConfig.getEmailColumn() + "\" ilike ? ";
+                " from \"" + databaseConfig.getUserTable().trim() + "\"" +
+                " where \"" + databaseConfig.getUsernameColumn() + "\" ilike ? or \"" + databaseConfig.getEmailColumn() + "\" ilike ? ";
         // TODO: Add check for full name (first name + last name)
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -164,7 +176,8 @@ public class UserDAO {
                     String username = resultSet.getString(1);
                     String email = resultSet.getString(2);
                     String credential = resultSet.getString(3);
-                    users.add(new SimpleUserModel(username, email, credential));
+                    Set<RoleModel> roleMappings = getRoleMappings(realm, username);
+                    users.add(new SimpleUserModel(username, email, credential, roleMappings));
                 }
                 return users;
             }
@@ -173,9 +186,9 @@ public class UserDAO {
         }
     }
 
-    public List<SimpleUserModel> searchForUser(Map<String, String> params, Integer firstResult, Integer maxResults) {
+    public List<SimpleUserModel> searchForUser(RealmModel realm, Map<String, String> params, Integer firstResult, Integer maxResults) {
         // Valid parameters are: "first" - first name "last" - last name "email" - email "username" - username "enabled" - is user enabled (true/false)
-        List<String> columns = Stream.of(userTableConfig.getUsernameColumn(), userTableConfig.getEmailColumn(), userTableConfig.getPasswordColumn())
+        List<String> columns = Stream.of(databaseConfig.getUsernameColumn(), databaseConfig.getEmailColumn(), databaseConfig.getPasswordColumn())
                 .map(col -> "\"" + col.trim() + "\"")
                 .collect(Collectors.toList());
         params = processParams(params);
@@ -185,7 +198,7 @@ public class UserDAO {
             statements.put(statement, p);
         });
         String sql = "select " + String.join(", ", columns) +
-                " from \"" + userTableConfig.getTableName().trim() + "\" ";
+                " from \"" + databaseConfig.getUserTable().trim() + "\" ";
 
         if (!statements.isEmpty()) {
             sql = sql + " where " +
@@ -213,7 +226,8 @@ public class UserDAO {
                     String username = resultSet.getString(1);
                     String email = resultSet.getString(2);
                     String credential = resultSet.getString(3);
-                    users.add(new SimpleUserModel(username, email, credential));
+                    Set<RoleModel> roleMappings = getRoleMappings(realm, username);
+                    users.add(new SimpleUserModel(username, email, credential, roleMappings));
                 }
                 return users;
             }
@@ -224,7 +238,7 @@ public class UserDAO {
 
     private String getStatementForParam(String name) {
         Param param = Param.fromName(name);
-        String tableName = param.tableName(userTableConfig);
+        String tableName = param.tableName(databaseConfig);
         return "\"" + tableName + "\" like ?";
 
     }
@@ -262,7 +276,7 @@ public class UserDAO {
                     .findFirst().orElseThrow(() -> new RuntimeException("Unsupported parameter: " + name));
         }
 
-        public String tableName(UserTableConfig config) {
+        public String tableName(DatabaseConfig config) {
             switch (this) {
                 case FIRST:
                 case LAST:
