@@ -7,25 +7,25 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.ReadOnlyException;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.adapter.AbstractUserAdapter;
 import org.keycloak.storage.user.UserLookupProvider;
+import org.keycloak.storage.user.UserQueryProvider;
 
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ExternalDatabaseStorageProvider implements
-        UserStorageProvider, UserLookupProvider, CredentialInputValidator, CredentialInputUpdater {
+        UserStorageProvider, UserLookupProvider, UserQueryProvider, CredentialInputValidator, CredentialInputUpdater {
 
     private final Map<String, UserModel> loadedUsers;
 
@@ -142,5 +142,59 @@ public class ExternalDatabaseStorageProvider implements
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public int getUsersCount(RealmModel realm) {
+        return userDAO.getUsersCount();
+    }
+
+    @Override
+    public List<UserModel> getUsers(RealmModel realm) {
+        return convertUserModel(realm, userDAO.getUsers());
+    }
+
+    @Override
+    public List<UserModel> getUsers(RealmModel realm, int firstResult, int maxResults) {
+        return convertUserModel(realm, userDAO.getUsers(firstResult, maxResults));
+    }
+
+    @Override
+    public List<UserModel> searchForUser(String search, RealmModel realm) {
+        return convertUserModel(realm, userDAO.searchForUser(search, null, null));
+    }
+
+    @Override
+    public List<UserModel> searchForUser(String search, RealmModel realm, int firstResult, int maxResults) {
+        return convertUserModel(realm, userDAO.searchForUser(search, firstResult, maxResults));
+    }
+
+    @Override
+    public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm) {
+        return convertUserModel(realm, userDAO.searchForUser(params, null, null));
+    }
+
+    @Override
+    public List<UserModel> searchForUser(Map<String, String> params, RealmModel realm, int firstResult, int maxResults) {
+        return convertUserModel(realm, userDAO.searchForUser(params, firstResult, maxResults));
+    }
+
+    @Override
+    public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group, int firstResult, int maxResults) {
+        return null;
+    }
+
+    @Override
+    public List<UserModel> getGroupMembers(RealmModel realm, GroupModel group) {
+        return null;
+    }
+
+    @Override
+    public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue, RealmModel realm) {
+        return null;
+    }
+
+    private List<UserModel> convertUserModel(RealmModel realm, List<SimpleUserModel> users) {
+        return users.stream().map(u -> createAdapter(realm, u)).collect(Collectors.toList());
     }
 }
