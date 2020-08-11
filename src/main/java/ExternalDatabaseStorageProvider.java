@@ -5,10 +5,7 @@ import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.models.*;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.ReadOnlyException;
 import org.keycloak.storage.StorageId;
@@ -121,10 +118,17 @@ public class ExternalDatabaseStorageProvider implements UserStorageProvider, Use
     }
 
     private UserModel createAdapter(RealmModel realm, String username) {
+        Set<RoleModel> roleMappings = userDAO.getRoleMappings(realm, username);
+
         return new AbstractUserAdapter(session, realm, model) {
             @Override
             public String getUsername() {
                 return username;
+            }
+
+            @Override
+            public Set<RoleModel> getRoleMappings() {
+                return roleMappings;
             }
         };
     }

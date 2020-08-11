@@ -1,22 +1,22 @@
 package config;
 
-public enum Database {
+public enum DatabaseEngine {
     POSTGRESQL("PostgreSQL", "jdbc:postgresql:", "org.postgresql.Driver");
 
     private String name;
     private String protocol;
     private String driver;
 
-    Database(String name, String protocol, String driver) {
+    DatabaseEngine(String name, String protocol, String driver) {
         this.name = name;
         this.protocol = protocol;
         this.driver = driver;
     }
 
-    public static Database fromName(String name) {
-        for (Database database : Database.values()) {
-            if (database.getName().equalsIgnoreCase(name)) {
-                return database;
+    public static DatabaseEngine fromName(String name) {
+        for (DatabaseEngine databaseEngine : DatabaseEngine.values()) {
+            if (databaseEngine.getName().equalsIgnoreCase(name)) {
+                return databaseEngine;
             }
         }
 
