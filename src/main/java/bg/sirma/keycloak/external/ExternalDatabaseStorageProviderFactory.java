@@ -2,6 +2,7 @@ package bg.sirma.keycloak.external;
 
 import bg.sirma.keycloak.external.config.DatabaseConfig;
 import bg.sirma.keycloak.external.config.DatabaseEngine;
+import bg.sirma.keycloak.external.config.EnabledColumnType;
 import bg.sirma.keycloak.external.config.PasswordHashingAlgorithm;
 import bg.sirma.keycloak.external.dao.UserDAO;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -27,7 +28,11 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
     public static final String DB_USER_TABLE_KEY = "db:user-table";
     public static final String DB_USER_TABLE_USERNAME_COLUMN_KEY = "db:user-table-username";
     public static final String DB_USER_TABLE_EMAIL_COLUMN_KEY = "db:user-table-email";
+    public static final String DB_USER_TABLE_FIRST_NAME_COLUMN_KEY = "db:user-table-first-name";
+    public static final String DB_USER_TABLE_LAST_NAME_COLUMN_KEY = "db:user-table-last-name";
     public static final String DB_USER_TABLE_PASSWORD_COLUMN_KEY = "db:user-table-password";
+    public static final String DB_USER_TABLE_ENABLED_COLUMN_KEY = "db:user-table-enabled";
+    public static final String DB_USER_TABLE_ENABLED_COLUMN_TYPE_KEY = "db:user-table-enabled_type";
     public static final String DB_PASSWORD_HASHING_ALGORITHM_KEY = "db:password-hashing-algorithm";
     public static final String DB_ROLES_SQL_KEY = "db:roles-sql";
 
@@ -45,6 +50,7 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
             String databaseName = config.getFirst(DB_DATABASE_NAME_KEY);
             String username = config.getFirst(DB_USERNAME_KEY);
             String password = config.getFirst(DB_PASSWORD_KEY);
+
             passwordHashingAlgorithm = PasswordHashingAlgorithm.fromName(config.getFirst(DB_PASSWORD_HASHING_ALGORITHM_KEY));
 
             Class.forName(databaseEngine.getDriver());
@@ -56,9 +62,14 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
             String usernameColumn = config.getFirst(DB_USER_TABLE_USERNAME_COLUMN_KEY);
             String emailColumn = config.getFirst(DB_USER_TABLE_EMAIL_COLUMN_KEY);
             String passwordColumn = config.getFirst(DB_USER_TABLE_PASSWORD_COLUMN_KEY);
+            String first = config.getFirst(DB_USER_TABLE_FIRST_NAME_COLUMN_KEY);
+            String last = config.getFirst(DB_USER_TABLE_LAST_NAME_COLUMN_KEY);
+            String enabled = config.getFirst(DB_USER_TABLE_ENABLED_COLUMN_KEY);
+            EnabledColumnType enabledColumnType = EnabledColumnType.valueOf(config.getFirst(DB_USER_TABLE_ENABLED_COLUMN_TYPE_KEY));
+
             String rolesSql = config.getFirst(DB_ROLES_SQL_KEY);
 
-            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, passwordColumn, rolesSql);
+            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, first, last, enabled, enabledColumnType, passwordColumn, rolesSql);
             userDAO = new UserDAO(connection, databaseConfig);
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,6 +144,36 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Email Column Name")
                 .defaultValue("email")
+                .add()
+
+                // First Name Column
+                .property().name(DB_USER_TABLE_FIRST_NAME_COLUMN_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("First Name Column Name")
+                .defaultValue("first_name")
+                .add()
+
+                // First Name Column
+                .property().name(DB_USER_TABLE_LAST_NAME_COLUMN_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Last Name Column Name")
+                .defaultValue("last_name")
+                .add()
+
+                // Enabled Column
+                .property().name(DB_USER_TABLE_ENABLED_COLUMN_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("User Enabled Column Name")
+                .defaultValue("enabled")
+                .add()
+
+                // Enabled Column Type
+                .property().name(DB_USER_TABLE_ENABLED_COLUMN_TYPE_KEY)
+                .type(ProviderConfigProperty.LIST_TYPE)
+                .label("User Enabled Column Type")
+                .helpText("This represents the type of the 'user enabled' column.")
+                .options(EnabledColumnType.BOOLEAN.name(), EnabledColumnType.NUMERIC.name())
+                .defaultValue(EnabledColumnType.BOOLEAN.name())
                 .add()
 
                 // Password Column

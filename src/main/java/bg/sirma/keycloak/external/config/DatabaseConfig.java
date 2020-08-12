@@ -5,13 +5,21 @@ public class DatabaseConfig {
     private final String userTable;
     private final String usernameColumn;
     private final String emailColumn;
+    private final String first;
+    private final String last;
+    private final String enabled;
+    private final EnabledColumnType enabledType;
     private final String passwordColumn;
     private final String rolesSql;
 
-    public DatabaseConfig(String userTable, String usernameColumn, String emailColumn, String passwordColumn, String rolesSql) {
+    public DatabaseConfig(String userTable, String usernameColumn, String emailColumn, String first, String last, String enabled, EnabledColumnType enabledColumnType, String passwordColumn, String rolesSql) {
         this.userTable = userTable;
         this.usernameColumn = usernameColumn;
         this.emailColumn = emailColumn;
+        this.first = first;
+        this.last = last;
+        this.enabled = enabled;
+        this.enabledType = enabledColumnType;
         this.passwordColumn = passwordColumn;
         this.rolesSql = rolesSql;
     }
@@ -26,6 +34,22 @@ public class DatabaseConfig {
 
     public String getEmailColumn() {
         return emailColumn;
+    }
+
+    public String getFirst() {
+        return first;
+    }
+
+    public String getLast() {
+        return last;
+    }
+
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public EnabledColumnType getEnabledType() {
+        return enabledType;
     }
 
     public String getPasswordColumn() {

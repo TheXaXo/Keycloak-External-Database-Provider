@@ -60,7 +60,7 @@ public class ExternalDatabaseStorageProvider implements
         UserModel adapter = loadedUsers.get(username);
 
         if (adapter == null) {
-            SimpleUserModel user = userDAO.getUserByColumn(realm, Column.USERNAME, username);
+            SimpleUserModel user = userDAO.getUserByColumn(realm, UserColumn.USERNAME, username);
 
             if (user != null) {
                 adapter = createAdapter(realm, user);
@@ -73,7 +73,7 @@ public class ExternalDatabaseStorageProvider implements
 
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
-        SimpleUserModel user = userDAO.getUserByColumn(realm, Column.EMAIL, email);
+        SimpleUserModel user = userDAO.getUserByColumn(realm, UserColumn.EMAIL, email);
 
         UserModel adapter = createAdapter(realm, user);
         loadedUsers.put(user.getUsername(), adapter);
@@ -139,6 +139,21 @@ public class ExternalDatabaseStorageProvider implements
             }
 
             @Override
+            public String getFirstName() {
+                return user.getFirstName();
+            }
+
+            @Override
+            public String getLastName() {
+                return user.getLastName();
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return user.isEnabled();
+            }
+
+            @Override
             public String getFirstAttribute(String name) {
                 if (name.equals(CREDENTIAL_ATTRIBUTE)) {
                     return user.getCredential();
@@ -181,6 +196,7 @@ public class ExternalDatabaseStorageProvider implements
 
     @Override
     public List<UserModel> searchForUser(String search, RealmModel realm) {
+        System.out.println("public List<UserModel> searchForUser(String search, RealmModel realm) {");
         return convertUserModel(realm, userDAO.searchForUser(realm, search, null, null));
     }
 
@@ -211,6 +227,7 @@ public class ExternalDatabaseStorageProvider implements
 
     @Override
     public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue, RealmModel realm) {
+        System.out.println("public List<UserModel> searchForUserByUserAttribute(String attrName, String attrValue, RealmModel realm) {");
         return null;
     }
 
