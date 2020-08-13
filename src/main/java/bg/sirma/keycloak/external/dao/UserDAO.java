@@ -251,7 +251,6 @@ public class UserDAO {
                 enabled = resultSet.getInt(5) > 0;
             }
             Set<RoleModel> roleMappings = this.getRoleMappings(realm, username);
-
             return new SimpleUserModel(username, email, firstName, lastName, enabled, credential, roleMappings);
         }
         return null;

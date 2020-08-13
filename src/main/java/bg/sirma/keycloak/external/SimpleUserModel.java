@@ -2,10 +2,10 @@ package bg.sirma.keycloak.external;
 
 import org.keycloak.models.RoleModel;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class SimpleUserModel {
-
     private final String username;
     private final String email;
     private final String firstName;
@@ -51,4 +51,24 @@ public class SimpleUserModel {
     public Set<RoleModel> getRoleMappings() {
         return roleMappings;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleUserModel that = (SimpleUserModel) o;
+        return enabled == that.enabled &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(credential, that.credential) &&
+                Objects.equals(roleMappings, that.roleMappings);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, email, firstName, lastName, enabled, credential, roleMappings);
+    }
+
 }
