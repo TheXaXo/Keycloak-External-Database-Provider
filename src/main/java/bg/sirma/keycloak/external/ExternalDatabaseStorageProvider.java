@@ -71,11 +71,12 @@ public class ExternalDatabaseStorageProvider implements
     @Override
     public UserModel getUserByEmail(String email, RealmModel realm) {
         SimpleUserModel user = userDAO.getUserByColumn(realm, UserColumn.EMAIL, email);
-
-        UserModel adapter = createAdapter(realm, user);
-        loadedUsers.put(user.getUsername(), adapter);
-
-        return adapter;
+        if (user != null) {
+            UserModel adapter = createAdapter(realm, user);
+            loadedUsers.put(user.getUsername(), adapter);
+            return adapter;
+        }
+        return null;
     }
 
     @Override
