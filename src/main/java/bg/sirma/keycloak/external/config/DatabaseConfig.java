@@ -10,9 +10,13 @@ public class DatabaseConfig {
     private final String enabled;
     private final EnabledColumnType enabledType;
     private final String passwordColumn;
-    private final String rolesSql;
+    private final String rolesTable;
+    private final String roleColumn;
+    private final String userIdForeignKeyColumn;
+    private final String userIdPrimaryKeyColumn;
 
-    public DatabaseConfig(String userTable, String usernameColumn, String emailColumn, String first, String last, String enabled, EnabledColumnType enabledColumnType, String passwordColumn, String rolesSql) {
+    public DatabaseConfig(String userTable, String usernameColumn, String emailColumn, String first, String last, String enabled, EnabledColumnType enabledColumnType, String passwordColumn,
+                          String rolesTable, String roleColumn, String userIdForeignKeyColumn, String userIdPrimaryKeyColumn) {
         this.userTable = userTable;
         this.usernameColumn = usernameColumn;
         this.emailColumn = emailColumn;
@@ -21,7 +25,10 @@ public class DatabaseConfig {
         this.enabled = enabled;
         this.enabledType = enabledColumnType;
         this.passwordColumn = passwordColumn;
-        this.rolesSql = rolesSql;
+        this.rolesTable = rolesTable;
+        this.roleColumn = roleColumn;
+        this.userIdForeignKeyColumn = userIdForeignKeyColumn;
+        this.userIdPrimaryKeyColumn = userIdPrimaryKeyColumn;
     }
 
     public String getUserTable() {
@@ -56,7 +63,19 @@ public class DatabaseConfig {
         return passwordColumn;
     }
 
-    public String getRolesSql() {
-        return rolesSql;
+    public String getRolesTable() {
+        return rolesTable;
+    }
+
+    public String getRoleColumn() {
+        return roleColumn;
+    }
+
+    public String getUserIdForeignKeyColumn() {
+        return userIdForeignKeyColumn;
+    }
+
+    public String getUserIdPrimaryKeyColumn() {
+        return userIdPrimaryKeyColumn;
     }
 }
