@@ -34,6 +34,11 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
     public static final String DB_USER_TABLE_ENABLED_COLUMN_KEY = "db:user-table-enabled";
     public static final String DB_USER_TABLE_ENABLED_COLUMN_TYPE_KEY = "db:user-table-enabled_type";
     public static final String DB_PASSWORD_HASHING_ALGORITHM_KEY = "db:password-hashing-algorithm";
+    public static final String DB_USER_ROLES_TABLE_KEY = "db:user-roles-table";
+    private static final String DB_USER_ROLE_COLUMN_KEY = "db:user-role_name";
+    private static final String DB_ROLE_USER_ID_FOREIGN_KEY = "db:role-table-user-id-fk";
+    private static final String DB_USER_PRIMARY_KEY = "db:user-table-pk";
+
     public static final String DB_ROLES_SQL_KEY = "db:roles-sql";
 
     @Override
@@ -67,9 +72,16 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
             String enabled = config.getFirst(DB_USER_TABLE_ENABLED_COLUMN_KEY);
             EnabledColumnType enabledColumnType = EnabledColumnType.valueOf(config.getFirst(DB_USER_TABLE_ENABLED_COLUMN_TYPE_KEY));
 
+            String rolesTable = config.getFirst(DB_USER_ROLES_TABLE_KEY);
+            String roleColumn = config.getFirst(DB_USER_ROLE_COLUMN_KEY);
+            String userIdForeignKeyColumn = config.getFirst(DB_ROLE_USER_ID_FOREIGN_KEY);
+            String userIdPrimaryKeyColumn = config.getFirst(DB_USER_PRIMARY_KEY);
+
             String rolesSql = config.getFirst(DB_ROLES_SQL_KEY);
 
-            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, first, last, enabled, enabledColumnType, passwordColumn, rolesSql);
+            DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, first, last, enabled, enabledColumnType, passwordColumn,
+                    rolesTable, roleColumn, userIdForeignKeyColumn, userIdPrimaryKeyColumn,
+                    rolesSql);
             userDAO = new UserDAO(connection, databaseConfig);
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,6 +201,30 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .label("Password Hashing Algorithm")
                 .options(PasswordHashingAlgorithm.PKCS5S2.getName())
                 .defaultValue(PasswordHashingAlgorithm.PKCS5S2.getName())
+                .add()
+
+                // User Roles Table Name
+                .property().name(DB_USER_ROLES_TABLE_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("User Roles Table Name")
+                .add()
+
+                // User Role Column Name
+                .property().name(DB_USER_ROLE_COLUMN_KEY)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Role Column Name")
+                .add()
+
+                // Role Table User ID Foreign Key
+                .property().name(DB_ROLE_USER_ID_FOREIGN_KEY)
+                .label("Role Table User ID Foreign Key")
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .add()
+
+                // User Table Primary Key
+                .property().name(DB_USER_PRIMARY_KEY)
+                .label("User Table Primary Key")
+                .type(ProviderConfigProperty.STRING_TYPE)
                 .add()
 
                 // Roles SQL
