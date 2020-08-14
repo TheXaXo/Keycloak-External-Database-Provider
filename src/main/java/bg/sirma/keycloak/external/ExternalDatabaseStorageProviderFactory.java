@@ -39,8 +39,6 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
     private static final String DB_ROLE_USER_ID_FOREIGN_KEY = "db:role-table-user-id-fk";
     private static final String DB_USER_PRIMARY_KEY = "db:user-table-pk";
 
-    public static final String DB_ROLES_SQL_KEY = "db:roles-sql";
-
     @Override
     public ExternalDatabaseStorageProvider create(KeycloakSession session, ComponentModel model) {
         UserDAO userDAO;
@@ -77,11 +75,8 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
             String userIdForeignKeyColumn = config.getFirst(DB_ROLE_USER_ID_FOREIGN_KEY);
             String userIdPrimaryKeyColumn = config.getFirst(DB_USER_PRIMARY_KEY);
 
-            String rolesSql = config.getFirst(DB_ROLES_SQL_KEY);
-
             DatabaseConfig databaseConfig = new DatabaseConfig(userTable, usernameColumn, emailColumn, first, last, enabled, enabledColumnType, passwordColumn,
-                    rolesTable, roleColumn, userIdForeignKeyColumn, userIdPrimaryKeyColumn,
-                    rolesSql);
+                    rolesTable, roleColumn, userIdForeignKeyColumn, userIdPrimaryKeyColumn);
             userDAO = new UserDAO(connection, databaseConfig);
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,11 +222,6 @@ public class ExternalDatabaseStorageProviderFactory implements UserStorageProvid
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .add()
 
-                // Roles SQL
-                .property().name(DB_ROLES_SQL_KEY)
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .label("Roles SQL")
-                .add()
                 .build();
     }
 

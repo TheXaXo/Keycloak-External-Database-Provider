@@ -14,11 +14,9 @@ public class DatabaseConfig {
     private final String roleColumn;
     private final String userIdForeignKeyColumn;
     private final String userIdPrimaryKeyColumn;
-    private final String rolesSql;
 
     public DatabaseConfig(String userTable, String usernameColumn, String emailColumn, String first, String last, String enabled, EnabledColumnType enabledColumnType, String passwordColumn,
-                          String rolesTable, String roleColumn, String userIdForeignKeyColumn, String userIdPrimaryKeyColumn,
-                          String rolesSql) {
+                          String rolesTable, String roleColumn, String userIdForeignKeyColumn, String userIdPrimaryKeyColumn) {
         this.userTable = userTable;
         this.usernameColumn = usernameColumn;
         this.emailColumn = emailColumn;
@@ -31,7 +29,6 @@ public class DatabaseConfig {
         this.roleColumn = roleColumn;
         this.userIdForeignKeyColumn = userIdForeignKeyColumn;
         this.userIdPrimaryKeyColumn = userIdPrimaryKeyColumn;
-        this.rolesSql = rolesSql;
     }
 
     public String getUserTable() {
@@ -80,9 +77,5 @@ public class DatabaseConfig {
 
     public String getUserIdPrimaryKeyColumn() {
         return userIdPrimaryKeyColumn;
-    }
-
-    public String getRolesSql() {
-        return rolesSql;
     }
 }
